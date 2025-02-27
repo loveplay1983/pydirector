@@ -12,7 +12,7 @@ from PySide6.QtGui import QFont, QIcon
 import pyautogui
 
 # Database Functions 
-def create_database(db_name='automation.db'):
+def create_database(db_name='actions.db'):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute('''
@@ -28,7 +28,7 @@ def create_database(db_name='automation.db'):
     conn.close()
 
 def add_action(action_name, action_type, parameters):
-    conn = sqlite3.connect('automation.db')
+    conn = sqlite3.connect('actions.db')
     cursor = conn.cursor()
     timestamp = datetime.datetime.now().isoformat()
     cursor.execute('''
@@ -39,7 +39,7 @@ def add_action(action_name, action_type, parameters):
     conn.close()
 
 def get_actions():
-    conn = sqlite3.connect('automation.db')
+    conn = sqlite3.connect('actions.db')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM actions ORDER BY id')
     actions = cursor.fetchall()
@@ -47,7 +47,7 @@ def get_actions():
     return actions
 
 def update_action(action_id, action_name, action_type, parameters):
-    conn = sqlite3.connect('automation.db')
+    conn = sqlite3.connect('actions.db')
     cursor = conn.cursor()
     timestamp = datetime.datetime.now().isoformat()
     cursor.execute('''
@@ -59,7 +59,7 @@ def update_action(action_id, action_name, action_type, parameters):
     conn.close()
 
 def delete_action(action_id):
-    conn = sqlite3.connect('automation.db')
+    conn = sqlite3.connect('actions.db')
     cursor = conn.cursor()
     cursor.execute('DELETE FROM actions WHERE id = ?', (action_id,))
     conn.commit()
@@ -76,7 +76,7 @@ def read_target_ids(csv_file='target.csv'):
         print("Error: targets.csv not found.")
         return []
 
-# Automation Logic (Updated with new actions)
+# Automation Logic 
 def execute_action(action, target_id=None):
     action_type = action[2]
     params = action[3]
@@ -126,7 +126,7 @@ def run_automation(loop_count=0):
             execute_action(action, target_id)
             time.sleep(1.0)  # Default delay between actions
 
-# Action Dialog (Updated with new actions)
+# Action Dialog 
 class ActionDialog(QDialog):
     def __init__(self, parent=None, action=None):
         super().__init__(parent)
@@ -181,11 +181,11 @@ class ActionDialog(QDialog):
             params
         )
 
-# Main Window (Updated with tray and UI enhancements)
+# Main Window 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Automation Tool")
+        self.setWindowTitle("PyDirector")
         self.setGeometry(100, 100, 800, 600)
         
         self.central_widget = QWidget()
