@@ -1,0 +1,61 @@
+2025-02-28 00:07:01,424 - DEBUG - Initializing MainWindow
+2025-02-28 00:07:01,439 - DEBUG - Tray icon initialized
+2025-02-28 00:07:01,439 - DEBUG - Shortcut (Esc) and flags initialized
+2025-02-28 00:07:01,440 - DEBUG - Database created and actions loaded
+2025-02-28 00:07:12,788 - DEBUG - Starting automation with 14 loops
+2025-02-28 00:07:12,788 - DEBUG - Starting run_automation
+2025-02-28 00:07:12,789 - DEBUG - Effective loops: 14
+2025-02-28 00:07:12,789 - DEBUG - Processing target ID: 1
+2025-02-28 00:07:12,789 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:07:14,447 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:07:16,104 - DEBUG - Processing target ID: 2
+2025-02-28 00:07:16,104 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:07:17,763 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:07:19,420 - DEBUG - Processing target ID: 3
+2025-02-28 00:07:19,420 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:07:21,075 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:07:22,731 - DEBUG - Processing target ID: 4
+2025-02-28 00:07:22,731 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:07:33,195 - DEBUG - Starting automation with 14 loops
+2025-02-28 00:07:33,195 - DEBUG - Starting run_automation
+2025-02-28 00:07:33,196 - DEBUG - Effective loops: 14
+2025-02-28 00:07:33,196 - DEBUG - Processing target ID: 1
+2025-02-28 00:07:33,196 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:07:34,854 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:07:36,511 - DEBUG - Processing target ID: 2
+2025-02-28 00:07:36,511 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:07:38,170 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:07:39,828 - DEBUG - Processing target ID: 3
+2025-02-28 00:07:39,828 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:07:41,485 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:08:30,447 - DEBUG - Initializing MainWindow
+2025-02-28 00:08:30,461 - DEBUG - Tray icon initialized
+2025-02-28 00:08:30,461 - DEBUG - Shortcut (Esc) and flags initialized
+2025-02-28 00:08:30,462 - DEBUG - Database created and actions loaded
+2025-02-28 00:08:41,526 - DEBUG - Starting automation with 14 loops
+2025-02-28 00:08:41,526 - DEBUG - Starting run_automation
+2025-02-28 00:08:41,526 - DEBUG - Effective loops: 14
+2025-02-28 00:08:41,526 - DEBUG - Processing target ID: 1
+2025-02-28 00:08:41,526 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:08:43,186 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:08:44,843 - DEBUG - Processing target ID: 2
+2025-02-28 00:08:44,843 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:08:46,502 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:16:01,205 - DEBUG - Initializing MainWindow
+2025-02-28 00:16:01,224 - DEBUG - Tray icon initialized
+2025-02-28 00:16:01,224 - DEBUG - Shortcut (Esc) and flags initialized
+2025-02-28 00:16:01,225 - DEBUG - Database created and actions loaded
+2025-02-28 00:16:11,518 - DEBUG - Starting automation with 3 loops
+2025-02-28 00:16:11,518 - DEBUG - Starting run_automation
+2025-02-28 00:16:11,519 - DEBUG - Effective loops: 3
+2025-02-28 00:16:11,519 - DEBUG - Processing target ID: 1
+2025-02-28 00:16:11,519 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:16:13,177 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:16:14,834 - DEBUG - Processing target ID: 2
+2025-02-28 00:16:14,834 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:16:16,492 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:16:18,150 - DEBUG - Processing target ID: 3
+2025-02-28 00:16:18,150 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-02-28 00:16:19,808 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-02-28 00:16:21,465 - DEBUG - Automation completed successfully
+2025-02-28 00:16:21,465 - DEBUG - Automation completed

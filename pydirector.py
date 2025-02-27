@@ -3,6 +3,8 @@ import sqlite3
 import datetime
 import csv
 import time
+import logging
+import os
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
     QPushButton, QLabel, QLineEdit, QFormLayout, QDialog, QComboBox, QSpinBox, QSystemTrayIcon, QMenu
@@ -11,9 +13,19 @@ from PySide6.QtCore import QTimer, Qt, QEvent
 from PySide6.QtGui import QFont, QIcon, QKeySequence, QShortcut
 import pyautogui
 
+# Set up logging
+logging.basicConfig(filename='pydirector.log', level=logging.DEBUG, 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 # Database Functions
 def create_database(db_name='actions.db'):
-    conn = sqlite3.connect(db_name)
+    db_path = resource_path(db_name)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS actions (
@@ -28,7 +40,7 @@ def create_database(db_name='actions.db'):
     conn.close()
 
 def add_action(action_name, action_type, parameters):
-    conn = sqlite3.connect('actions.db')
+    conn = sqlite3.connect(resource_path('actions.db'))
     cursor = conn.cursor()
     timestamp = datetime.datetime.now().isoformat()
     cursor.execute('''
@@ -39,7 +51,7 @@ def add_action(action_name, action_type, parameters):
     conn.close()
 
 def get_actions():
-    conn = sqlite3.connect('actions.db')
+    conn = sqlite3.connect(resource_path('actions.db'))
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM actions ORDER BY id')
     actions = cursor.fetchall()
@@ -47,7 +59,7 @@ def get_actions():
     return actions
 
 def update_action(action_id, action_name, action_type, parameters):
-    conn = sqlite3.connect('actions.db')
+    conn = sqlite3.connect(resource_path('actions.db'))
     cursor = conn.cursor()
     timestamp = datetime.datetime.now().isoformat()
     cursor.execute('''
@@ -59,7 +71,7 @@ def update_action(action_id, action_name, action_type, parameters):
     conn.close()
 
 def delete_action(action_id):
-    conn = sqlite3.connect('actions.db')
+    conn = sqlite3.connect(resource_path('actions.db'))
     cursor = conn.cursor()
     cursor.execute('DELETE FROM actions WHERE id = ?', (action_id,))
     conn.commit()
@@ -67,12 +79,14 @@ def delete_action(action_id):
 
 # CSV Reading
 def read_target_ids(csv_file='target.csv'):
+    csv_path = resource_path(csv_file)
     try:
-        with open(csv_file, 'r') as f:
+        with open(csv_path, 'r') as f:
             reader = csv.reader(f)
             target_ids = [row[0] for row in reader]
         return target_ids
     except FileNotFoundError:
+        logging.error(f"CSV file not found: {csv_path}")
         print("Error: target.csv not found.")
         return []
 
@@ -109,28 +123,37 @@ def execute_action(action, target_id=None):
             seconds = float(params)
             time.sleep(seconds)
     except Exception as e:
+        logging.error(f"Action '{action[1]}' failed: {e}")
         print(f"Action '{action[1]}' failed: {e}")
 
 def run_automation(loop_count=0, stop_flag=None):
+    logging.debug("Starting run_automation")
     target_ids = read_target_ids()
     actions = get_actions()
     if not target_ids or not actions:
+        logging.warning("No targets or actions to process.")
         print("No targets or actions to process.")
         return False
     effective_loops = len(target_ids) if loop_count == 0 else loop_count
+    logging.debug(f"Effective loops: {effective_loops}")
     for i in range(effective_loops):
-        if stop_flag and stop_flag():  # Check if we should stop
+        if stop_flag and stop_flag():
+            logging.info("Automation interrupted by user")
             print("Automation interrupted by user")
             return False
         target_id = target_ids[i] if loop_count == 0 else i + 1
+        logging.debug(f"Processing target ID: {target_id}")
         print(f"Processing target ID: {target_id}")
         for action in actions:
-            if stop_flag and stop_flag():  # Check again per action
+            if stop_flag and stop_flag():
+                logging.info("Automation interrupted by user")
                 print("Automation interrupted by user")
                 return False
+            logging.debug(f"Executing action: {action}")
             execute_action(action, target_id)
-            time.sleep(1.0)  # Default delay between actions
-    return True  # Completed successfully
+            time.sleep(1.0)
+    logging.debug("Automation completed successfully")
+    return True
 
 # Action Dialog
 class ActionDialog(QDialog):
@@ -190,6 +213,7 @@ class ActionDialog(QDialog):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        logging.debug("Initializing MainWindow")
         self.setWindowTitle("PyDirector")
         self.setGeometry(100, 100, 800, 600)
         
@@ -198,18 +222,15 @@ class MainWindow(QMainWindow):
         self.layout = QVBoxLayout(self.central_widget)
         self.setFont(QFont("Arial", 16))
         
-        # Mouse position label
         self.mouse_label = QLabel("Mouse Position: X: 0, Y: 0")
         self.layout.addWidget(self.mouse_label)
         
-        # Action table
         self.table = QTableWidget()
         self.table.setColumnCount(5)
         self.table.setHorizontalHeaderLabels(['ID', 'Name', 'Type', 'Parameters', 'Timestamp'])
         self.table.horizontalHeader().setFont(QFont("Arial", 16))
         self.layout.addWidget(self.table)
         
-        # Buttons
         self.add_button = QPushButton("Add Action")
         self.add_button.clicked.connect(self.add_action)
         self.layout.addWidget(self.add_button)
@@ -226,15 +247,13 @@ class MainWindow(QMainWindow):
         self.start_button.clicked.connect(self.start_automation)
         self.layout.addWidget(self.start_button)
         
-        # Loop input
         self.loop_label = QLabel("Number of Loops (0 for all targets):")
         self.loop_input = QSpinBox()
         self.loop_input.setMinimum(0)
         self.layout.addWidget(self.loop_label)
         self.layout.addWidget(self.loop_input)
         
-        # System tray setup
-        self.tray_icon = QSystemTrayIcon(QIcon("./icon/gear.png"), self)
+        self.tray_icon = QSystemTrayIcon(QIcon(resource_path("./icon/gear.png")), self)
         self.tray_menu = QMenu()
         self.show_action = self.tray_menu.addAction("Show")
         self.quit_action = self.tray_menu.addAction("Quit")
@@ -242,23 +261,23 @@ class MainWindow(QMainWindow):
         self.quit_action.triggered.connect(QApplication.quit)
         self.tray_icon.setContextMenu(self.tray_menu)
         self.tray_icon.show()
+        logging.debug("Tray icon initialized")
         self.tray_icon.activated.connect(self.tray_icon_activated)
         
-        # Timer for mouse position
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_mouse_position)
         self.timer.start(100)
         
-        # Shortcut for interrupting automation
-        self.stop_shortcut = QShortcut(QKeySequence("Ctrl+C"), self)
+        self.stop_shortcut = QShortcut(QKeySequence("Esc"), self)
         self.stop_shortcut.activated.connect(self.stop_automation)
-        self.is_running = False  # Flag to track if automation is active
-        self.stop_requested = False  # Flag to signal stop request
+        self.is_running = False
+        self.stop_requested = False
+        logging.debug("Shortcut (Esc) and flags initialized")
         
         create_database()
         self.load_actions()
+        logging.debug("Database created and actions loaded")
         
-        # Style the UI
         self.setStyleSheet("""
             QMainWindow { background-color: #f0f0f0; }
             QLabel { font-size: 16px; }
@@ -269,7 +288,6 @@ class MainWindow(QMainWindow):
         """)
         self.layout.setSpacing(15)
         
-        # Start minimized to tray
         self.hide()
 
     def update_mouse_position(self):
@@ -314,18 +332,22 @@ class MainWindow(QMainWindow):
         loop_count = self.loop_input.value()
         self.is_running = True
         self.stop_requested = False
-        self.hide()  # Minimize to tray
-        print("Automation started. Press Ctrl+C to stop.")
+        self.hide()
+        logging.debug(f"Starting automation with {loop_count} loops")
+        print("Automation started. Press Esc to stop.")
         completed = run_automation(loop_count, stop_flag=lambda: self.stop_requested)
         self.is_running = False
         if completed:
+            logging.debug("Automation completed")
             self.tray_icon.showMessage("PyDirector", "Automation completed!", QSystemTrayIcon.Information, 2000)
         else:
+            logging.debug("Automation interrupted")
             self.tray_icon.showMessage("PyDirector", "Automation interrupted by user.", QSystemTrayIcon.Information, 2000)
 
     def stop_automation(self):
         if self.is_running:
             self.stop_requested = True
+            logging.debug("Stop requested via Esc")
             print("Stop requested via shortcut")
 
     def tray_icon_activated(self, reason):
@@ -345,5 +367,3 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
     sys.exit(app.exec())
-
-
