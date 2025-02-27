@@ -5,13 +5,13 @@ import csv
 import time
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
-    QPushButton, QLabel, QLineEdit, QFormLayout, QDialog, QComboBox, QSpinBox, QSystemTrayIcon
+    QPushButton, QLabel, QLineEdit, QFormLayout, QDialog, QComboBox, QSpinBox, QSystemTrayIcon, QMenu
 )
-from PySide6.QtCore import QTimer, Qt
-from PySide6.QtGui import QFont, QIcon
+from PySide6.QtCore import QTimer, Qt, QEvent
+from PySide6.QtGui import QFont, QIcon, QKeySequence, QShortcut
 import pyautogui
 
-# Database Functions 
+# Database Functions
 def create_database(db_name='actions.db'):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -73,10 +73,10 @@ def read_target_ids(csv_file='target.csv'):
             target_ids = [row[0] for row in reader]
         return target_ids
     except FileNotFoundError:
-        print("Error: targets.csv not found.")
+        print("Error: target.csv not found.")
         return []
 
-# Automation Logic 
+# Automation Logic
 def execute_action(action, target_id=None):
     action_type = action[2]
     params = action[3]
@@ -91,9 +91,9 @@ def execute_action(action, target_id=None):
         elif action_type == 'double_click':
             button = params.lower()
             pyautogui.doubleClick(button=button)
-        elif action_type == 'right_click':  # New action
+        elif action_type == 'right_click':
             pyautogui.rightClick()
-        elif action_type == 'drag':  # New action
+        elif action_type == 'drag':
             coords = params.replace('"', '').replace("'", "").split(',')
             x, y = map(int, coords)
             pyautogui.dragTo(x, y, duration=0.5)
@@ -103,7 +103,7 @@ def execute_action(action, target_id=None):
         elif action_type == 'type':
             text = params
             if target_id and '{target_id}' in text:
-                text = text.replace('{target_id}', target_id)
+                text = text.replace('{target_id}', str(target_id))
             pyautogui.typewrite(text)
         elif action_type == 'wait':
             seconds = float(params)
@@ -111,28 +111,34 @@ def execute_action(action, target_id=None):
     except Exception as e:
         print(f"Action '{action[1]}' failed: {e}")
 
-def run_automation(loop_count=0):
+def run_automation(loop_count=0, stop_flag=None):
     target_ids = read_target_ids()
     actions = get_actions()
     if not target_ids or not actions:
         print("No targets or actions to process.")
-        return
-    # effective_loops = len(target_ids) if loop_count == 0 else min(loop_count, len(target_ids))
+        return False
     effective_loops = len(target_ids) if loop_count == 0 else loop_count
     for i in range(effective_loops):
-        target_id = target_ids[i] if loop_count == 0 else i+1
+        if stop_flag and stop_flag():  # Check if we should stop
+            print("Automation interrupted by user")
+            return False
+        target_id = target_ids[i] if loop_count == 0 else i + 1
         print(f"Processing target ID: {target_id}")
         for action in actions:
+            if stop_flag and stop_flag():  # Check again per action
+                print("Automation interrupted by user")
+                return False
             execute_action(action, target_id)
             time.sleep(1.0)  # Default delay between actions
+    return True  # Completed successfully
 
-# Action Dialog 
+# Action Dialog
 class ActionDialog(QDialog):
     def __init__(self, parent=None, action=None):
         super().__init__(parent)
         self.setWindowTitle("Add/Edit Action")
         self.layout = QFormLayout(self)
-        self.setFont(QFont("Arial", 16))  # Larger font
+        self.setFont(QFont("Arial", 16))
 
         self.action_name = QLineEdit()
         self.action_type = QComboBox()
@@ -166,7 +172,6 @@ class ActionDialog(QDialog):
         self.ok_button.clicked.connect(self.accept)
         self.layout.addWidget(self.ok_button)
 
-        # Style
         self.setStyleSheet("""
             QLineEdit, QComboBox { font-size: 16px; padding: 5px; }
             QPushButton { font-size: 16px; padding: 8px; background-color: #4CAF50; color: white; border-radius: 5px; }
@@ -181,7 +186,7 @@ class ActionDialog(QDialog):
             params
         )
 
-# Main Window 
+# Main Window
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -191,7 +196,7 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
-        self.setFont(QFont("Arial", 16))  # Larger font
+        self.setFont(QFont("Arial", 16))
         
         # Mouse position label
         self.mouse_label = QLabel("Mouse Position: X: 0, Y: 0")
@@ -228,19 +233,31 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.loop_label)
         self.layout.addWidget(self.loop_input)
         
-        # System tray
-        self.tray_icon = QSystemTrayIcon(QIcon.fromTheme("system"), self)
+        # System tray setup
+        self.tray_icon = QSystemTrayIcon(QIcon("./icon/gear.png"), self)
+        self.tray_menu = QMenu()
+        self.show_action = self.tray_menu.addAction("Show")
+        self.quit_action = self.tray_menu.addAction("Quit")
+        self.show_action.triggered.connect(self.show_window)
+        self.quit_action.triggered.connect(QApplication.quit)
+        self.tray_icon.setContextMenu(self.tray_menu)
         self.tray_icon.show()
-        self.tray_icon.activated.connect(self.restore_from_tray)
+        self.tray_icon.activated.connect(self.tray_icon_activated)
         
         # Timer for mouse position
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_mouse_position)
-        self.timer.start(100)  # Update every 100ms
+        self.timer.start(100)
+        
+        # Shortcut for interrupting automation
+        self.stop_shortcut = QShortcut(QKeySequence("Ctrl+C"), self)
+        self.stop_shortcut.activated.connect(self.stop_automation)
+        self.is_running = False  # Flag to track if automation is active
+        self.stop_requested = False  # Flag to signal stop request
         
         create_database()
         self.load_actions()
-
+        
         # Style the UI
         self.setStyleSheet("""
             QMainWindow { background-color: #f0f0f0; }
@@ -251,6 +268,9 @@ class MainWindow(QMainWindow):
             QSpinBox { font-size: 16px; padding: 5px; }
         """)
         self.layout.setSpacing(15)
+        
+        # Start minimized to tray
+        self.hide()
 
     def update_mouse_position(self):
         x, y = pyautogui.position()
@@ -292,16 +312,36 @@ class MainWindow(QMainWindow):
     
     def start_automation(self):
         loop_count = self.loop_input.value()
-        self.showMinimized()  # Minimize to tray
-        run_automation(loop_count)
-        self.tray_icon.showMessage("Automation", "Automation completed!", QSystemTrayIcon.Information, 2000)
+        self.is_running = True
+        self.stop_requested = False
+        self.hide()  # Minimize to tray
+        print("Automation started. Press Ctrl+C to stop.")
+        completed = run_automation(loop_count, stop_flag=lambda: self.stop_requested)
+        self.is_running = False
+        if completed:
+            self.tray_icon.showMessage("PyDirector", "Automation completed!", QSystemTrayIcon.Information, 2000)
+        else:
+            self.tray_icon.showMessage("PyDirector", "Automation interrupted by user.", QSystemTrayIcon.Information, 2000)
 
-    def restore_from_tray(self, reason):
+    def stop_automation(self):
+        if self.is_running:
+            self.stop_requested = True
+            print("Stop requested via shortcut")
+
+    def tray_icon_activated(self, reason):
         if reason == QSystemTrayIcon.DoubleClick:
-            self.showNormal()
+            self.show_window()
+
+    def show_window(self):
+        self.showNormal()
+
+    def closeEvent(self, event: QEvent):
+        event.ignore()
+        self.hide()
+        self.tray_icon.showMessage("PyDirector", "Minimized to tray. Right-click the tray icon to quit.", 
+                                   QSystemTrayIcon.Information, 2000)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.show()
     sys.exit(app.exec())
