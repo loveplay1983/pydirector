@@ -162,7 +162,7 @@ def run_automation(loop_count=0, stop_flag=None):
                 return False
             logging.debug(f"Executing action: {action}")
             execute_action(action, target_id)
-            time.sleep(1.0)
+            time.sleep(0.5)
     logging.debug("Automation completed successfully")
     return True
 
