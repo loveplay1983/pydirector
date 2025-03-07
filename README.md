@@ -464,6 +464,235 @@ With `--onefile`, PyInstaller embeds `target.csv` and `gear.png` inside `pydirec
 - **For Single File**: Use `--onefile` with manual placement (Option 1) or the hybrid approach (Option 3). 
 
 
-## 6. `Todo`
+
+## 5. How does the code work ???
+
+### How the Code Works
+
+"PyDirector," is a GUI-based automation tool built with PySide6 (Qt for Python), PyAutoGUI, SQLite, and other libraries. It allows users to define, manage, and execute mouse/keyboard automation actions stored in a database, optionally looping over a list of target IDs from a CSV file. Here’s a detailed breakdown:
+
+#### 1. **Imports and Setup**
+- **Libraries**: 
+  - `sys`, `os`: Handle file paths and executable behavior (e.g., PyInstaller support).
+  - `sqlite3`: Manage a database for storing actions.
+  - `datetime`, `time`: Handle timestamps and delays.
+  - `csv`: Read target IDs from a CSV file.
+  - `logging`: Log events to `pydirector.log` for debugging.
+  - `PySide6`: Build the GUI (QMainWindow, QTableWidget, etc.).
+  - `pyautogui`: Perform automation tasks (mouse movement, clicks, typing, etc.).
+- **Logging**: Configured to write debug/info/error messages to `pydirector.log`.
+- **Paths**: 
+  - `get_base_path()` and `resource_path()` ensure the script works whether run as a Python file or a PyInstaller executable.
+  - `DB_PATH` points to `actions.db` in the base directory.
+
+#### 2. **Database Management**
+- **Schema**: The `actions` table in `actions.db` has columns: `id`, `action_name`, `action_type`, `parameters`, `timestamp`.
+- **Functions**:
+  - `create_database()`: Creates the table if it doesn’t exist.
+  - `add_action()`, `update_action()`, `delete_action()`: CRUD operations for actions.
+  - `get_actions()`: Retrieves all actions for display or execution.
+
+#### 3. **CSV Handling**
+- `read_target_ids()`: Reads a single-column CSV file (`target.csv`) to get a list of target IDs. These IDs can be used in actions (e.g., typing them).
+
+#### 4. **Automation Logic**
+- **Core Function**: `execute_action(action, target_id=None)`:
+  - Takes an action tuple from the database (`id`, `name`, `type`, `parameters`, `timestamp`) and an optional `target_id`.
+  - Supports these `action_type`s:
+    - `move`: Moves mouse to `(x, y)` with `duration=0.5`.
+    - `click`: Single click (`left` or `right`).
+    - `double_click`: Double click (`left` or `right`).
+    - `right_click`: Right-click at current position.
+    - `drag`: Drags mouse to `(x, y)` with `duration=0.5`.
+    - `hotkey`: Presses key combinations (e.g., `ctrl,c`).
+    - `type`: Types text, optionally replacing `{target_id}` with the CSV value.
+    - `wait`: Pauses for specified seconds.
+  - Errors are logged and printed if an action fails.
+- **Run Function**: `run_automation(loop_count=0, stop_flag=None)`:
+  - Loads target IDs and actions.
+  - Loops either over all target IDs (`loop_count=0`) or a specified number of times.
+  - For each loop:
+    - Picks a `target_id` (from CSV or loop index).
+    - Executes all actions sequentially, passing the `target_id`.
+    - Adds a `time.sleep(1.0)` between actions.
+  - Stops if `stop_flag()` returns `True` (e.g., Esc pressed).
+
+#### 5. **GUI (MainWindow)**
+- **Components**:
+  - **Mouse Position Label**: Updates every 100ms via a `QTimer`.
+  - **Table**: Displays actions from the database.
+  - **Buttons**: Add, Edit, Delete actions; Start automation.
+  - **Loop Input**: A QSpinBox to set the number of loops (0 = use all target IDs).
+  - **System Tray**: Minimizes to tray with Show/Quit options.
+  - **Shortcut**: Esc key stops automation.
+- **Behavior**:
+  - Minimizes to tray on close; double-click tray icon to restore.
+  - Actions are managed via an `ActionDialog` popup.
+  - Automation hides the window, runs, and shows a tray notification when done/interrupted.
+
+#### 6. **Execution Flow**
+1. User adds actions via GUI (e.g., "Move to 100,200", "Type Hello").
+2. User sets loop count and clicks "Start Automation".
+3. Script reads `target.csv`, executes actions for each target ID, and logs progress.
+4. User can press Esc to stop; tray notifications report the outcome.
+
+---
+
+### Controlling the Interval Between Actions
+
+#### Current Timing Control
+- **Between Actions**: In `run_automation()`, there’s a hardcoded `time.sleep(1.0)` after each `execute_action()` call. This means a **1-second delay** separates the end of one action from the start of the next, regardless of the action type.
+- **Within Actions**: For `move` and `drag` actions, `pyautogui.moveTo()` and `pyautogui.dragTo()` use `duration=0.5`, which controls how long the mouse takes to reach its destination (0.5 seconds). Other actions (e.g., `click`, `type`) execute instantly or at PyAutoGUI’s default speed.
+
+#### Is `duration` a Method to Control Intervals?
+- **Not Directly for Intervals Between Actions**: The `duration` parameter in `moveTo` and `dragTo` controls the **duration of the movement itself**, not the pause between actions. For example:
+  - `pyautogui.moveTo(100, 200, duration=0.5)` takes 0.5 seconds to move the mouse, then the script immediately proceeds to `time.sleep(1.0)` before the next action.
+  - Changing `duration` affects how “smooth” or “slow” the movement looks, not the gap between actions.
+- **Suitable for Specific Actions**: It’s a timing control only for `move` and `drag`, not for `click`, `type`, etc., which don’t use `duration`.
+
+#### How to Control the Interval Between Actions
+To adjust the timing **between** actions (the pause after one action completes and before the next begins), you have these options:
+
+1. **Modify the `time.sleep(1.0)` in `run_automation`**:
+   - Current code:
+     ```python
+     for action in actions:
+         if stop_flag and stop_flag():
+             return False
+         logging.debug(f"Executing action: {action}")
+         execute_action(action, target_id)
+         time.sleep(1.0)  # Fixed 1-second delay
+     ```
+   - Change `1.0` to your desired delay (e.g., `0.5` for 0.5 seconds, `2.0` for 2 seconds):
+     ```python
+     time.sleep(0.5)  # Now 0.5 seconds between actions
+     ```
+
+2. **Make the Delay Configurable**:
+   - Add a UI element (e.g., a QSpinBox) for users to set the delay:
+     ```python
+     # In MainWindow.__init__
+     self.delay_label = QLabel("Delay Between Actions (seconds):")
+     self.delay_input = QSpinBox()
+     self.delay_input.setMinimum(0)
+     self.delay_input.setMaximum(10)  # Max 10 seconds
+     self.delay_input.setValue(1)  # Default 1 second
+     self.layout.addWidget(self.delay_label)
+     self.layout.addWidget(self.delay_input)
+     ```
+   - Update `run_automation` to use this value:
+     ```python
+     def start_automation(self):
+         loop_count = self.loop_input.value()
+         delay = self.delay_input.value()  # Get delay from UI
+         self.is_running = True
+         self.stop_requested = False
+         self.hide()
+         logging.debug(f"Starting automation with {loop_count} loops and {delay} sec delay")
+         print("Automation started. Press Esc to stop.")
+         completed = run_automation(loop_count, delay, stop_flag=lambda: self.stop_requested)
+         self.is_running = False
+         # ... rest of the method ...
+
+     def run_automation(loop_count=0, delay=1.0, stop_flag=None):
+         # ... existing code ...
+         for action in actions:
+             if stop_flag and stop_flag():
+                 return False
+             logging.debug(f"Executing action: {action}")
+             execute_action(action, target_id)
+             time.sleep(delay)  # Use configurable delay
+         # ... rest of the function ...
+     ```
+
+3. **Store Delay in the Database**:
+   - Add a `delay_after` column to the `actions` table:
+     ```python
+     def create_database(db_name='actions.db'):
+         conn = sqlite3.connect(DB_PATH)
+         cursor = conn.cursor()
+         cursor.execute('''
+             CREATE TABLE IF NOT EXISTS actions (
+                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 action_name TEXT,
+                 action_type TEXT,
+                 parameters TEXT,
+                 delay_after REAL DEFAULT 1.0,  -- New column
+                 timestamp TEXT
+             )
+         ''')
+         conn.commit()
+         conn.close()
+     ```
+   - Update `add_action`, `update_action`, and `ActionDialog` to include `delay_after`.
+   - Modify `run_automation` to use each action’s delay:
+     ```python
+     for action in actions:
+         if stop_flag and stop_flag():
+             return False
+         logging.debug(f"Executing action: {action}")
+         execute_action(action, target_id)
+         time.sleep(action[4])  # Use delay_after from database
+     ```
+
+#### Total Time Between Actions
+The effective interval between the start of one action and the start of the next is:
+- **Action Execution Time** (e.g., 0.5 seconds for `move` with `duration=0.5`, near-instant for `click`) + **Delay** (currently 1.0 second).
+- Example:
+  - `moveTo(100, 200, duration=0.5)`: 0.5s movement + 1.0s sleep = **1.5s total**.
+  - `click()`: ~0s execution + 1.0s sleep = **1.0s total**.
+
+#### Recommendation
+- **Best Approach**: Modify `time.sleep(1.0)` or make it configurable via the UI (Option 2). This gives you flexibility without overcomplicating the database.
+- **Duration’s Role**: Use `duration` to fine-tune `move` and `drag` speeds, but rely on `time.sleep()` for the interval between all actions.
+
+---
+
+### Example Modification
+Here’s how you could implement a configurable delay:
+```python
+# In MainWindow.__init__, after loop_input:
+self.delay_label = QLabel("Delay Between Actions (seconds):")
+self.delay_input = QSpinBox()
+self.delay_input.setMinimum(0)
+self.delay_input.setMaximum(10)
+self.delay_input.setValue(1)
+self.layout.addWidget(self.delay_label)
+self.layout.addWidget(self.delay_input)
+
+# Update start_automation:
+def start_automation(self):
+    loop_count = self.loop_input.value()
+    delay = self.delay_input.value()
+    self.is_running = True
+    self.stop_requested = False
+    self.hide()
+    logging.debug(f"Starting automation with {loop_count} loops and {delay} sec delay")
+    print("Automation started. Press Esc to stop.")
+    completed = run_automation(loop_count, delay, stop_flag=lambda: self.stop_requested)
+    self.is_running = False
+    # ... rest of the method ...
+
+# Update run_automation signature:
+def run_automation(loop_count=0, delay=1.0, stop_flag=None):
+    # ... existing code ...
+    for action in actions:
+        if stop_flag and stop_flag():
+            return False
+        logging.debug(f"Executing action: {action}")
+        execute_action(action, target_id)
+        time.sleep(delay)  # Configurable delay
+    # ... rest of the function ...
+```
+
+Now, users can set the delay (0-10 seconds) in the GUI, and it applies uniformly between actions.
+
+---
+
+### Final Thoughts
+To control intervals, tweaking `time.sleep()` is the most straightforward and effective method.
+
+
+## 7. `Todo`
 
 - Add `interruption` in the middle of running (CTRL-C seems taking no effect)
