@@ -180,3 +180,17 @@
 2025-03-06 23:46:30,861 - DEBUG - Executing action: (10, 'wait', 'wait', '3', '2025-03-06T22:56:27.919266')
 2025-03-06 23:46:34,862 - DEBUG - Automation completed successfully
 2025-03-06 23:46:34,862 - DEBUG - Automation completed
+2025-03-07 14:29:29,412 - DEBUG - Initializing MainWindow
+2025-03-07 14:29:29,518 - DEBUG - Tray icon initialized
+2025-03-07 14:29:29,518 - DEBUG - Shortcut (Esc) and flags initialized
+2025-03-07 14:29:29,520 - DEBUG - Database created and actions loaded
+2025-03-07 14:29:38,128 - DEBUG - Starting automation with 1 loops
+2025-03-07 14:29:38,128 - DEBUG - Starting run_automation
+2025-03-07 14:29:38,131 - DEBUG - Effective loops: 1
+2025-03-07 14:29:38,131 - DEBUG - Processing target ID: 1
+2025-03-07 14:29:38,131 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-07 14:29:39,786 - DEBUG - Executing action: (8, 'm-minimize', 'move', '2387,24', '2025-03-06T22:54:59.078960')
+2025-03-07 14:29:41,443 - DEBUG - Executing action: (9, 'click', 'click', 'left', '2025-03-06T22:55:16.538322')
+2025-03-07 14:29:42,548 - DEBUG - Executing action: (10, 'wait', 'wait', '3', '2025-03-06T22:56:27.919266')
+2025-03-07 14:29:46,550 - DEBUG - Automation completed successfully
+2025-03-07 14:29:46,550 - DEBUG - Automation completed
