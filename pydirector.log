@@ -59,3 +59,124 @@
 2025-02-28 00:16:19,808 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
 2025-02-28 00:16:21,465 - DEBUG - Automation completed successfully
 2025-02-28 00:16:21,465 - DEBUG - Automation completed
+2025-03-06 22:51:16,750 - DEBUG - Initializing MainWindow
+2025-03-06 22:51:16,945 - DEBUG - Tray icon initialized
+2025-03-06 22:51:16,945 - DEBUG - Shortcut (Esc) and flags initialized
+2025-03-06 22:51:16,947 - DEBUG - Database created and actions loaded
+2025-03-06 22:51:36,183 - DEBUG - Starting automation with 5 loops
+2025-03-06 22:51:36,184 - DEBUG - Starting run_automation
+2025-03-06 22:51:36,186 - DEBUG - Effective loops: 5
+2025-03-06 22:51:36,186 - DEBUG - Processing target ID: 1
+2025-03-06 22:51:36,186 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:51:37,841 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:51:39,496 - DEBUG - Processing target ID: 2
+2025-03-06 22:51:39,497 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:51:41,152 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:51:42,809 - DEBUG - Processing target ID: 3
+2025-03-06 22:51:42,809 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:51:44,464 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:51:46,120 - DEBUG - Processing target ID: 4
+2025-03-06 22:51:46,120 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:51:47,776 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:51:49,432 - DEBUG - Processing target ID: 5
+2025-03-06 22:51:49,432 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:51:51,087 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:51:52,743 - DEBUG - Automation completed successfully
+2025-03-06 22:51:52,743 - DEBUG - Automation completed
+2025-03-06 22:52:15,108 - DEBUG - Starting automation with 5 loops
+2025-03-06 22:52:15,108 - DEBUG - Starting run_automation
+2025-03-06 22:52:15,110 - DEBUG - Effective loops: 5
+2025-03-06 22:52:15,110 - DEBUG - Processing target ID: 1
+2025-03-06 22:52:15,110 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:52:16,766 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:52:18,423 - DEBUG - Processing target ID: 2
+2025-03-06 22:52:18,423 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:52:20,079 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:52:21,734 - DEBUG - Processing target ID: 3
+2025-03-06 22:52:21,734 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:52:23,389 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:52:25,046 - DEBUG - Processing target ID: 4
+2025-03-06 22:52:25,046 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:52:26,702 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:52:28,357 - DEBUG - Processing target ID: 5
+2025-03-06 22:52:28,358 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:52:30,015 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:52:31,671 - DEBUG - Automation completed successfully
+2025-03-06 22:52:31,671 - DEBUG - Automation completed
+2025-03-06 22:52:59,538 - DEBUG - Starting automation with 5 loops
+2025-03-06 22:52:59,539 - DEBUG - Starting run_automation
+2025-03-06 22:52:59,541 - DEBUG - Effective loops: 5
+2025-03-06 22:52:59,541 - DEBUG - Processing target ID: 1
+2025-03-06 22:52:59,541 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:53:01,197 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:53:02,853 - DEBUG - Processing target ID: 2
+2025-03-06 22:53:02,854 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:53:04,510 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:53:06,165 - DEBUG - Processing target ID: 3
+2025-03-06 22:53:06,166 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:53:07,822 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:53:09,478 - DEBUG - Processing target ID: 4
+2025-03-06 22:53:09,478 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:53:11,134 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:53:12,790 - DEBUG - Processing target ID: 5
+2025-03-06 22:53:12,790 - DEBUG - Executing action: (4, 'm2', 'move', '4163,1463', '2025-02-27T21:22:25.520094')
+2025-03-06 22:53:14,446 - DEBUG - Executing action: (6, 'move', 'move', '3196,405', '2025-02-27T21:19:45.997818')
+2025-03-06 22:53:16,102 - DEBUG - Automation completed successfully
+2025-03-06 22:53:16,102 - DEBUG - Automation completed
+2025-03-06 22:53:56,009 - DEBUG - Starting automation with 5 loops
+2025-03-06 22:53:56,009 - DEBUG - Starting run_automation
+2025-03-06 22:53:56,011 - DEBUG - Effective loops: 5
+2025-03-06 22:53:56,011 - DEBUG - Processing target ID: 1
+2025-03-06 22:53:56,011 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 22:53:57,667 - DEBUG - Processing target ID: 2
+2025-03-06 22:53:57,667 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 22:53:59,324 - DEBUG - Processing target ID: 3
+2025-03-06 22:53:59,324 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 22:54:00,980 - DEBUG - Processing target ID: 4
+2025-03-06 22:54:00,980 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 22:54:02,637 - DEBUG - Processing target ID: 5
+2025-03-06 22:54:02,637 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 22:54:04,293 - DEBUG - Automation completed successfully
+2025-03-06 22:54:04,294 - DEBUG - Automation completed
+2025-03-06 22:55:20,079 - DEBUG - Starting automation with 1 loops
+2025-03-06 22:55:20,079 - DEBUG - Starting run_automation
+2025-03-06 22:55:20,081 - DEBUG - Effective loops: 1
+2025-03-06 22:55:20,081 - DEBUG - Processing target ID: 1
+2025-03-06 22:55:20,082 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 22:55:21,738 - DEBUG - Executing action: (8, 'm-minimize', 'move', '2387,24', '2025-03-06T22:54:59.078960')
+2025-03-06 22:55:23,396 - DEBUG - Executing action: (9, 'click', 'click', 'left', '2025-03-06T22:55:16.538322')
+2025-03-06 22:55:24,502 - DEBUG - Automation completed successfully
+2025-03-06 22:55:24,502 - DEBUG - Automation completed
+2025-03-06 22:56:35,997 - DEBUG - Starting automation with 2 loops
+2025-03-06 22:56:35,998 - DEBUG - Starting run_automation
+2025-03-06 22:56:36,000 - DEBUG - Effective loops: 2
+2025-03-06 22:56:36,000 - DEBUG - Processing target ID: 1
+2025-03-06 22:56:36,001 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 22:56:37,658 - DEBUG - Executing action: (8, 'm-minimize', 'move', '2387,24', '2025-03-06T22:54:59.078960')
+2025-03-06 22:56:39,315 - DEBUG - Executing action: (9, 'click', 'click', 'left', '2025-03-06T22:55:16.538322')
+2025-03-06 22:56:40,429 - DEBUG - Executing action: (10, 'wait', 'wait', '3', '2025-03-06T22:56:27.919266')
+2025-03-06 22:56:44,429 - DEBUG - Processing target ID: 2
+2025-03-06 22:56:44,430 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 22:56:46,124 - DEBUG - Executing action: (8, 'm-minimize', 'move', '2387,24', '2025-03-06T22:54:59.078960')
+2025-03-06 22:56:47,781 - DEBUG - Executing action: (9, 'click', 'click', 'left', '2025-03-06T22:55:16.538322')
+2025-03-06 22:56:48,887 - DEBUG - Executing action: (10, 'wait', 'wait', '3', '2025-03-06T22:56:27.919266')
+2025-03-06 22:56:52,888 - DEBUG - Automation completed successfully
+2025-03-06 22:56:52,888 - DEBUG - Automation completed
+2025-03-06 23:09:51,183 - DEBUG - Initializing MainWindow
+2025-03-06 23:09:51,221 - DEBUG - Tray icon initialized
+2025-03-06 23:09:51,221 - DEBUG - Shortcut (Esc) and flags initialized
+2025-03-06 23:09:51,222 - DEBUG - Database created and actions loaded
+2025-03-06 23:46:16,577 - DEBUG - Initializing MainWindow
+2025-03-06 23:46:16,614 - DEBUG - Tray icon initialized
+2025-03-06 23:46:16,614 - DEBUG - Shortcut (Esc) and flags initialized
+2025-03-06 23:46:16,616 - DEBUG - Database created and actions loaded
+2025-03-06 23:46:26,441 - DEBUG - Starting automation with 1 loops
+2025-03-06 23:46:26,441 - DEBUG - Starting run_automation
+2025-03-06 23:46:26,443 - DEBUG - Effective loops: 1
+2025-03-06 23:46:26,443 - DEBUG - Processing target ID: 1
+2025-03-06 23:46:26,443 - DEBUG - Executing action: (7, 'a', 'move', '115,78', '2025-03-06T22:53:51.957294')
+2025-03-06 23:46:28,100 - DEBUG - Executing action: (8, 'm-minimize', 'move', '2387,24', '2025-03-06T22:54:59.078960')
+2025-03-06 23:46:29,759 - DEBUG - Executing action: (9, 'click', 'click', 'left', '2025-03-06T22:55:16.538322')
+2025-03-06 23:46:30,861 - DEBUG - Executing action: (10, 'wait', 'wait', '3', '2025-03-06T22:56:27.919266')
+2025-03-06 23:46:34,862 - DEBUG - Automation completed successfully
+2025-03-06 23:46:34,862 - DEBUG - Automation completed

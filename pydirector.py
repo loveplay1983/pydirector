@@ -17,15 +17,26 @@ import pyautogui
 logging.basicConfig(filename='pydirector.log', level=logging.DEBUG, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
+# def resource_path(relative_path):
+#     if hasattr(sys, '_MEIPASS'):
+#         return os.path.join(sys._MEIPASS, relative_path)
+#     return os.path.join(os.path.abspath("."), relative_path)
+
+# DB_PATH = os.path.join(os.path.expanduser("~"), "actions.db")  # Configure the database file to be stored in home directory
+
+# Configure data path
+def get_base_path():
+    if getattr(sys, 'frozen', False):  # Running as PyInstaller executable
+        return os.path.dirname(sys.executable)  # Directory of pydirector.exe
+    return os.path.dirname(os.path.abspath(__file__))  # Directory of pydirector.py
+BASE_PATH = get_base_path()
 def resource_path(relative_path):
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
+    return os.path.join(BASE_PATH, relative_path)
+DB_PATH = os.path.join(BASE_PATH, "actions.db")  # Configure the database file to be stored in home directory
 
 # Database Functions
 def create_database(db_name='actions.db'):
-    db_path = resource_path(db_name)
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS actions (
@@ -40,7 +51,7 @@ def create_database(db_name='actions.db'):
     conn.close()
 
 def add_action(action_name, action_type, parameters):
-    conn = sqlite3.connect(resource_path('actions.db'))
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     timestamp = datetime.datetime.now().isoformat()
     cursor.execute('''
@@ -51,7 +62,7 @@ def add_action(action_name, action_type, parameters):
     conn.close()
 
 def get_actions():
-    conn = sqlite3.connect(resource_path('actions.db'))
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM actions ORDER BY id')
     actions = cursor.fetchall()
@@ -59,7 +70,7 @@ def get_actions():
     return actions
 
 def update_action(action_id, action_name, action_type, parameters):
-    conn = sqlite3.connect(resource_path('actions.db'))
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     timestamp = datetime.datetime.now().isoformat()
     cursor.execute('''
@@ -71,7 +82,7 @@ def update_action(action_id, action_name, action_type, parameters):
     conn.close()
 
 def delete_action(action_id):
-    conn = sqlite3.connect(resource_path('actions.db'))
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('DELETE FROM actions WHERE id = ?', (action_id,))
     conn.commit()
