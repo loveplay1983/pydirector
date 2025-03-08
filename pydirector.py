@@ -17,13 +17,6 @@ import pyautogui
 logging.basicConfig(filename='pydirector.log', level=logging.DEBUG, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-# def resource_path(relative_path):
-#     if hasattr(sys, '_MEIPASS'):
-#         return os.path.join(sys._MEIPASS, relative_path)
-#     return os.path.join(os.path.abspath("."), relative_path)
-
-# DB_PATH = os.path.join(os.path.expanduser("~"), "actions.db")  # Configure the database file to be stored in home directory
-
 # Configure data path
 def get_base_path():
     if getattr(sys, 'frozen', False):  # Running as PyInstaller executable
@@ -33,6 +26,7 @@ BASE_PATH = get_base_path()
 def resource_path(relative_path):
     return os.path.join(BASE_PATH, relative_path)
 DB_PATH = os.path.join(BASE_PATH, "actions.db")  # Configure the database file to be stored in home directory
+ICON_PATH = resource_path("./icon/gear.png")  # Path to the icon file
 
 # Database Functions
 def create_database(db_name='actions.db'):
@@ -227,11 +221,17 @@ class MainWindow(QMainWindow):
         logging.debug("Initializing MainWindow")
         self.setWindowTitle("PyDirector")
         self.setGeometry(100, 100, 800, 600)
+        self.setWindowIcon(QIcon(ICON_PATH))
         
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
         self.setFont(QFont("Arial", 16))
+        
+        # Add status label to show automation state
+        self.status_label = QLabel("Status: Idle")
+        self.status_label.setFont(QFont("Arial", 16))
+        self.layout.addWidget(self.status_label)
         
         self.mouse_label = QLabel("Mouse Position: X: 0, Y: 0")
         self.layout.addWidget(self.mouse_label)
@@ -299,7 +299,8 @@ class MainWindow(QMainWindow):
         """)
         self.layout.setSpacing(15)
         
-        self.hide()
+        # Show the window on startup
+        self.show()
 
     def update_mouse_position(self):
         x, y = pyautogui.position()
@@ -340,14 +341,19 @@ class MainWindow(QMainWindow):
             self.load_actions()
     
     def start_automation(self):
+        if self.is_running:
+            return
         loop_count = self.loop_input.value()
         self.is_running = True
         self.stop_requested = False
+        self.status_label.setText("Status: Running")
         self.hide()
         logging.debug(f"Starting automation with {loop_count} loops")
         print("Automation started. Press Esc to stop.")
         completed = run_automation(loop_count, stop_flag=lambda: self.stop_requested)
         self.is_running = False
+        self.status_label.setText("Status: Idle" if completed else "Status: Interrupted")
+        self.show()  # Show the window after automation completes
         if completed:
             logging.debug("Automation completed")
             self.tray_icon.showMessage("PyDirector", "Automation completed!", QSystemTrayIcon.Information, 2000)
@@ -358,6 +364,7 @@ class MainWindow(QMainWindow):
     def stop_automation(self):
         if self.is_running:
             self.stop_requested = True
+            self.status_label.setText("Status: Stopping")
             logging.debug("Stop requested via Esc")
             print("Stop requested via shortcut")
 
@@ -367,6 +374,7 @@ class MainWindow(QMainWindow):
 
     def show_window(self):
         self.showNormal()
+        self.status_label.setText("Status: Idle" if not self.is_running else "Status: Running")
 
     def closeEvent(self, event: QEvent):
         event.ignore()
