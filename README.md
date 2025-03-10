@@ -15,7 +15,7 @@ pip install pyinstaller
 ```bash
 pyinstaller --onefile --windowed --add-data "icon/gear.png;icon" --add-data "target.csv;." --hidden-import=pyautogui --hidden-import=PySide6.QtWidgets --hidden-import=PySide6.QtCore --hidden-import=PySide6.QtGui .\pydirector.py
 ```
-[text](target.csv) [text](icon) [text](actions.db)
+
 
 ## 3. `How to Run`
 > Run the executable in the `dist` folder directly and follow the instructions.
