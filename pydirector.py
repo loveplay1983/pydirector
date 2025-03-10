@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
     QPushButton, QLabel, QLineEdit, QFormLayout, QDialog, QComboBox, QSpinBox, QSystemTrayIcon, QMenu
 )
-from PySide6.QtCore import QTimer, Qt, QEvent
+from PySide6.QtCore import QTimer, Qt, QEvent, QThread, Signal, QObject
 from PySide6.QtGui import QFont, QIcon, QKeySequence, QShortcut
 import pyautogui
 
@@ -20,13 +20,13 @@ logging.basicConfig(filename='pydirector.log', level=logging.DEBUG,
 # Configure data path
 def get_base_path():
     if getattr(sys, 'frozen', False):  # Running as PyInstaller executable
-        return os.path.dirname(sys.executable)  # Directory of pydirector.exe
-    return os.path.dirname(os.path.abspath(__file__))  # Directory of pydirector.py
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
 BASE_PATH = get_base_path()
 def resource_path(relative_path):
     return os.path.join(BASE_PATH, relative_path)
-DB_PATH = os.path.join(BASE_PATH, "actions.db")  # Configure the database file to be stored in home directory
-ICON_PATH = resource_path("./icon/gear.png")  # Path to the icon file
+DB_PATH = os.path.join(BASE_PATH, "actions.db")
+ICON_PATH = resource_path("./icon/gear.png")
 
 # Database Functions
 def create_database(db_name='actions.db'):
@@ -96,7 +96,7 @@ def read_target_ids(csv_file='target.csv'):
         return []
 
 # Automation Logic
-def execute_action(action, target_id=None):
+def execute_action(action, target_id=None, stop_flag=None):
     action_type = action[2]
     params = action[3]
     try:
@@ -126,7 +126,29 @@ def execute_action(action, target_id=None):
             pyautogui.typewrite(text)
         elif action_type == 'wait':
             seconds = float(params)
-            time.sleep(seconds)
+            start_time = time.time()
+            while time.time() - start_time < seconds:
+                if stop_flag and stop_flag():
+                    logging.info("Wait interrupted")
+                    return
+                time.sleep(0.1)
+        elif action_type == 'scroll':
+            clicks = int(params)
+            pyautogui.scroll(clicks)
+        elif action_type == 'screenshot':
+            if params:
+                x, y, width, height = map(int, params.split(','))
+                screenshot = pyautogui.screenshot(region=(x, y, width, height))
+            else:
+                screenshot = pyautogui.screenshot()
+            screenshot_dir = os.path.join(BASE_PATH, 'screenshots')
+            os.makedirs(screenshot_dir, exist_ok=True)
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            screenshot_path = os.path.join(screenshot_dir, f'screenshot_{timestamp}.png')
+            screenshot.save(screenshot_path)
+            logging.info(f"Screenshot saved to {screenshot_path}")
+        elif action_type == 'press':
+            pyautogui.press(params)
     except Exception as e:
         logging.error(f"Action '{action[1]}' failed: {e}")
         print(f"Action '{action[1]}' failed: {e}")
@@ -155,10 +177,23 @@ def run_automation(loop_count=0, stop_flag=None):
                 print("Automation interrupted by user")
                 return False
             logging.debug(f"Executing action: {action}")
-            execute_action(action, target_id)
+            execute_action(action, target_id, stop_flag=stop_flag)
             time.sleep(0.5)
     logging.debug("Automation completed successfully")
     return True
+
+# Worker Class for Threading
+class Worker(QObject):
+    finished = Signal()
+
+    def __init__(self, loop_count, stop_flag):
+        super().__init__()
+        self.loop_count = loop_count
+        self.stop_flag = stop_flag
+
+    def run(self):
+        completed = run_automation(self.loop_count, stop_flag=self.stop_flag)
+        self.finished.emit()
 
 # Action Dialog
 class ActionDialog(QDialog):
@@ -170,7 +205,7 @@ class ActionDialog(QDialog):
 
         self.action_name = QLineEdit()
         self.action_type = QComboBox()
-        self.action_type.addItems(['move', 'click', 'double_click', 'right_click', 'drag', 'hotkey', 'type', 'wait'])
+        self.action_type.addItems(['move', 'click', 'double_click', 'right_click', 'drag', 'hotkey', 'type', 'wait', 'scroll', 'screenshot', 'press'])
         self.parameters = QLineEdit()
         
         self.desc_label = QLabel(
@@ -179,10 +214,13 @@ class ActionDialog(QDialog):
             "- click: 'left' or 'right'\n"
             "- double_click: 'left' or 'right'\n"
             "- right_click: none (current position)\n"
-            "- drag: 'x,y' (e.g., 300,400)\n"
+            "- drag: 'x,y' to select text or move (e.g., 400,300)\n"
             "- hotkey: keys (e.g., ctrl,c for copy)\n"
             "- type: text or '{target_id}'\n"
-            "- wait: seconds (e.g., 2.5)"
+            "- wait: seconds (e.g., 2.5)\n"
+            "- scroll: clicks (e.g., -10 to scroll down, 10 to scroll up)\n"
+            "- screenshot: optional 'x,y,width,height' for region (e.g., 100,200,300,400)\n"
+            "- press: single key (e.g., down, up, enter, tab)\n"
         )
         self.desc_label.setFont(QFont("Arial", 12))
 
@@ -228,7 +266,6 @@ class MainWindow(QMainWindow):
         self.layout = QVBoxLayout(self.central_widget)
         self.setFont(QFont("Arial", 16))
         
-        # Add status label to show automation state
         self.status_label = QLabel("Status: Idle")
         self.status_label.setFont(QFont("Arial", 16))
         self.layout.addWidget(self.status_label)
@@ -299,7 +336,6 @@ class MainWindow(QMainWindow):
         """)
         self.layout.setSpacing(15)
         
-        # Show the window on startup
         self.show()
 
     def update_mouse_position(self):
@@ -350,11 +386,20 @@ class MainWindow(QMainWindow):
         self.hide()
         logging.debug(f"Starting automation with {loop_count} loops")
         print("Automation started. Press Esc to stop.")
-        completed = run_automation(loop_count, stop_flag=lambda: self.stop_requested)
+        
+        self.worker = Worker(loop_count, lambda: self.stop_requested)
+        self.thread = QThread()
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.on_automation_finished)
+        self.thread.start()
+
+    def on_automation_finished(self):
         self.is_running = False
-        self.status_label.setText("Status: Idle" if completed else "Status: Interrupted")
-        self.show()  # Show the window after automation completes
-        if completed:
+        self.status_label.setText("Status: Idle" if not self.stop_requested else "Status: Interrupted")
+        self.show()
+        if not self.stop_requested:
             logging.debug("Automation completed")
             self.tray_icon.showMessage("PyDirector", "Automation completed!", QSystemTrayIcon.Information, 2000)
         else:
@@ -364,7 +409,6 @@ class MainWindow(QMainWindow):
     def stop_automation(self):
         if self.is_running:
             self.stop_requested = True
-            self.status_label.setText("Status: Stopping")
             logging.debug("Stop requested via Esc")
             print("Stop requested via shortcut")
 

@@ -375,3 +375,11 @@
 2025-03-08 15:52:40,796 - DEBUG - Executing action: (8, 'm-minimize', 'move', '2387,24', '2025-03-06T22:54:59.078960')
 2025-03-08 15:52:41,952 - DEBUG - Executing action: (9, 'click', 'click', 'left', '2025-03-06T22:55:16.538322')
 2025-03-08 15:52:42,556 - DEBUG - Executing action: (10, 'wait', 'wait', '3', '2025-03-06T22:56:27.919266')
+2025-03-10 21:15:09,586 - DEBUG - Initializing MainWindow
+2025-03-10 21:15:09,618 - DEBUG - Tray icon initialized
+2025-03-10 21:15:09,619 - DEBUG - Shortcut (Esc) and flags initialized
+2025-03-10 21:15:09,622 - DEBUG - Database created and actions loaded
+2025-03-10 21:15:41,135 - DEBUG - Initializing MainWindow
+2025-03-10 21:15:41,167 - DEBUG - Tray icon initialized
+2025-03-10 21:15:41,167 - DEBUG - Shortcut (Esc) and flags initialized
+2025-03-10 21:15:41,170 - DEBUG - Database created and actions loaded
